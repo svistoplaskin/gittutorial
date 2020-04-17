@@ -1,0 +1,15 @@
+DOCKER
+
+docker ps - запущенные контейнеры
+docker ps -a  - все контейнеры которые были запущены
+docker images - вывести образы
+docker search nginx - ищет на docker hub image docker с nginx
+docker pull nginx
+docker run -d -p 1237:80 nginx - запускать докер как демон и перенаправить 80 порт докера на 1237 порт основного хоста
+docker rm [CONTAINER ID] - удалить контейнер 
+docker rmi [IMAGE] - удалить образ
+docker exec -it [CONTAINER ID] /bin/bash
+docker build -t . [name images]
+docker run -it --net=host centos_named
+docker rm $(docker ps -aq) - удалить все контейнеры
+docker commit 9f3ff86f86cf pups/pups:v2
