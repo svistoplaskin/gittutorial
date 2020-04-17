@@ -1,0 +1,11 @@
+Создание пользователя для подключения ansible
+cd
+useradd -m tas
+cd ~tas/
+mkdir .ssh
+cd .ssh
+echo "ssh-rsa AAAA----------END
+chown user:user authorized_keys
+chmod 600 authorized_keys
+systemctl sshd restart
+echo "user    ALL=(ALL:ALL) NOPASSWD:  ALL" >> /etc/sudoers
