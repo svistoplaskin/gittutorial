@@ -1,0 +1,184 @@
+(echo "Subject:Size /vmail";  du -hs vmail | tail -1;) | sendmail -F "post_sizer"  tas@domain.ru
+
+tcpdump -vvv -i ens160 tcp or udp or icmp and not port 22  - все за исключением ssh
+
+tcpdump -vvv -n -i eth0 host x.x.x.x  - где фигугрирует
+---------------------------------------------------------
+dig @ns.domain.ru doamin.ru. axfr ----  запросить зону
+
+
+yum -y update && yum -y upgrade
+
+
+sudo yum groupinstall "Development tools"
+yum -y install epel-release && yum -y install nano && yum -y install mc && yum -y install htop && yum -y install iftop && yum -y install net-tools && yum install -y wget && yum -y install open-vm-tools
+
+
+timedatectl set-timezone Europe/Moscow
+da
+dnstop ens160 -n domain.ru
+
+nmtui - NetworkMannager
+netstat -rn -f inet
+_______________________________________________________
+mcedit /etc/sysconfig/selinux	- отключение SELinux
+SELINUX=disabled
+reboot -n
+sestatus
+________________________________________________________________
+
+_________________________________________
+ipv6 отключение
+nano /etc/sysctl.conf
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+sysctl -p
+__________________________________________
+время:
+yum install chrony
+systemctl start chronyd
+systemctl enable chronyd
+______________________________________________
+systemctl status firewalld	- статусlocate 
+systemctl start firewalld	- запуск
+systemctl enable firewalld	- автостарт
+firewall-cmd --list-all		- посмотреть правила
+firewall-cmd --get-services	- посмотреть сервисы
+firewall-cmd --permanent --add-port=53/udp	- открыть порт
+firewall-cmd --permanent --remove-port=80/tcp	- закрыть порт
+firewall-cmd --permanent --remove-service=dhcpv6-client  
+firewall-cmd --reload		- перечитать правила и применить
+
+netstat -ntulp			- открытые порты
+______________________________________________
+
+----------------------------------------------
+- rndc reconfig   - приведет к перезагрузке основной конфигурации файла, а также конфигурации новых зон и еще масса приятных и удобных вещей.
+- rndc reload перезагрузит конфигурацию (если нет ошибок в конфигурации named.conf)
+- rndc stats — выведет статистику того, что накешировал Ваш DNS
+----------------------------------------------
+
+
+
+systemctl list-units --type service -all	- посмотреть все известные службы
+systemctl list-unit-files --state enabled	- посмотреть автозагрузку
+systemctl enable application			- добавить в автозагрузку
+systemctl disable applciation			- убрать из автозагрузки
+systemctl start application			- запустить службу
+systemctl stop application			- остановить службу
+_____________________________________________
+тюнинг history
+nano ~/.bashrc
+export HISTSIZE=10000
+export HISTTIMEFORMAT="%h %d %H:%M:%S "
+PROMPT_COMMAND='history -a'
+export HISTIGNORE="ls:ll:history:w:htop"
+
+source ~/.bashrc		- применяем
+_____________________________________________
+
+
+yum list installed		- список всех установленных пакетов
+yum list available		- список всех доступных пакетов
+yum list installed bind		- установлен ли указанный пакет
+yum updateinfo list security	- получить информацию о доступных обновлениях безопасности
+yum grouplist			- вывести список групп
+yum groupinfo			- вывести описание и содержимое группы 
+yum groupinstall "Basic Web Server" - установка группы пакетов «Basic Web Server»
+yum repolist			- список подключенных репозиториев, cd /etc/yum.repos.d/
+yum remove
+___________________________________________________________________________________________________________________
+Установка BIND:
+
+cd /etc/yum.repos.d/
+
+https://copr.fedorainfracloud.org/coprs/isc/bind-esv/
+
+wget https://copr.fedorainfracloud.org/coprs/isc/bind-esv/repo/epel-7/isc-bind-esv-epel-7.repo		"9.11 stable"
+
+wget https://copr.fedorainfracloud.org/coprs/isc/bind/repo/epel-7/isc-bind-epel-7.repo		- "9.12"
+______________________________________________________________________
+__________________________________________
+
+named -V
+
+cd /etc
+rndc-confgen -a
+
+rndc reload  - перечитать конфиг и перезапустить сервер
+
+-rw-r----- 1 root named 1051 Oct 1 2012 /etc/named.conf
+
+rndc reload — перезагрузит конфигурацию (если нет ошибок в конфигурации named.conf)
+rndc stop — остановит DNS сервер
+rndc stats — выведет статистику того, что накешировал Ваш DNS
+rndc dump — выбросит свой кеш в дамп файл, прописанный в конфиге named.conf
+rndc flush — сбросит свой кеш в ноль
+rndc flushname zona.com — удалит у себя из кеша информацию о зоне zona.com
+rndc halt — убиение named’а без сохранения всего того, что он хотел сохранить в этот момент
+rndc reconfig — приведет к перезагрузке основной конфигурации файла, а также конфигурации новых зон и еще масса приятных и удобных вещей.
+
+_____________________________________
+отключение ipv6
+nano /etc/sysctl.conf
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+sysctl -p
+service network restart		- reload network
+ip a
+_____________________________________
+Редактируем конфиг /etc/sysconfig/chronyd  OPTIONS="-4" 
+
+
+Сборка и Установка пакетов
+_____________________________
+./configure
+make
+sudo make install
+
+
+/var/log/dovecot.log
+
+/var/log/exim/main.log
+
+
+
+[exim]
+
+port   = smtp,465,submission
+logpath = %(exim_main_log)s
+
+[dovecot]
+
+enabled = true
+port    = pop3,pop3s,imap,imaps,submission,465,sieve
+filter = dovecot
+logpath = %(dovecot_log)s
+backend = %(dovecot_backend)s
+
+FAIL2BAN
+
+fail2ban-client -v status dovecot|exim
+
+fail2ban-client set dovecot unbanip 111.111.111.111
+
+----------------------------------------------------
+
+services: ssh
+  ports: 25/tcp 80/tcp 993/tcp 465/tcp 4443/tcp
+
+
+-A INPUT -p tcp -m tcp --dport 25 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 993 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 80 -m limit --limit 20/min --limit-burst 100 -j ACCEPT
+-A INPUT -s x.x.x.x/24 -p icmp -j ACCEPT
+-A INPUT -s x.x.x.x/24 -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -s x.x.x.x/24 -p tcp -m tcp --dport 80 -j ACCEPT
+-A INPUT -s x.x.x.x/24 -p tcp -m tcp --dport 3306 -j ACCEPT
+-A INPUT -s x.x.x.x/24 -p tcp -m tcp --dport 4443 -j ACCEPT
+
+ iptables -I INPUT 1 -s x.x.x.x -j DROP   - вставить первым
+
+ iptables -D INPUT 22   удалить правило номер 22
+
+service iptables save
